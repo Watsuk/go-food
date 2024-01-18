@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/Watsuk/go-food/src/entity"
+	"github.com/Watsuk/go-food/src/handler"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -31,12 +34,21 @@ func main() {
 		log.Fatal(err)
 	}
 
-	store := database.CreateStore(db)
-	mux := web.CreateMux(store)
+	user := &entity.User{
+		ID:        1,
+		Username:  "watsuk",
+		Password:  "1234",
+		Email:     "test@gmail.com",
+		Role:      1,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	mux := handler.NewHandlerUser(user)
 
 	err = http.ListenAndServe(":8080", mux)
 	if err != nil {
-		_ := fmt.Errorf("could not listen on port 8080 %v", err)
+		fmt.Errorf("could not listen on port 8080 %v", err)
 		return
 	}
 

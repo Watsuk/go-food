@@ -31,6 +31,9 @@ CREATE TABLE `chart` (
   `label` varchar(64) NOT NULL,
   `description` text,
   `price` float NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`consumable_id`),
   KEY `consumable_truck_id_idx` (`truck_id`),
   CONSTRAINT `consumable_truck_id` FOREIGN KEY (`truck_id`) REFERENCES `trucks` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -58,6 +61,7 @@ CREATE TABLE `order_detail` (
   `consumable_id` int(11) NOT NULL,
   `quantity` int(11) NOT NULL DEFAULT '1',
   `comment` text,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `detail_order_id_idx` (`order_id`),
   KEY `detail_consumable_id_idx` (`consumable_id`),
   CONSTRAINT `detail_consumable_id` FOREIGN KEY (`consumable_id`) REFERENCES `chart` (`consumable_id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -86,6 +90,8 @@ CREATE TABLE `orders` (
   `user_id` int(11) NOT NULL,
   `truck_id` int(11) NOT NULL,
   `price` float NOT NULL,
+  `hours` timestamp NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`order_id`),
   KEY `order_user_id_idx` (`user_id`),
   KEY `order_truck_id_idx` (`truck_id`),
@@ -115,7 +121,10 @@ CREATE TABLE `trucks` (
   `name` varchar(256) NOT NULL,
   `slot_buffer` tinyint(3) unsigned NOT NULL,
   `opening` time NOT NULL,
-  `closing` time NOT NULL,
+  `closing` time NOT NULL
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -142,6 +151,9 @@ CREATE TABLE `users` (
   `pw_hash` char(60) NOT NULL,
   `email` varchar(320) NOT NULL,
   `permissions` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;

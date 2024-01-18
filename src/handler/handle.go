@@ -1,22 +1,23 @@
 package handler
 
 import (
+	"github.com/Watsuk/go-food/src/entity"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
 
-func NewHandler(store *database.Store) *Handler {
-	handlers := &Handler{
+func NewHandlerUser(user *entity.User) *HandlerUser {
+	handlers := &HandlerUser{
 		chi.NewRouter(),
-		store,
+		user,
 	}
 
-	handler.Use(middleware.Logger)
+	handlers.Use(middleware.Logger)
 
-	return &Handler{}
+	return handlers
 }
 
-type Handler struct {
+type HandlerUser struct {
 	*chi.Mux
-	store *database.Store
+	user *entity.User
 }
