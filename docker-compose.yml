@@ -5,18 +5,25 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:3000"
+      - "3000:3000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+
   db:
     image: 'mariadb'
     restart: always
     environment:
-      MYSQL_DATABASE: data
+      MYSQL_DATABASE: buffet
       MYSQL_ROOT_PASSWORD: ${DB_PASS}
     volumes:
       - ./etc/database.sql:/docker-entrypoint-initdb.d/dump.sql
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   adminer:
       image: adminer
       restart: always

@@ -2,10 +2,8 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/Watsuk/go-food/src/entity"
 	"github.com/Watsuk/go-food/src/handler"
@@ -17,7 +15,7 @@ func main() {
 		User:                 "root",
 		Passwd:               "root",
 		Net:                  "tcp",
-		Addr:                 "localhost:3306",
+		Addr:                 "db",
 		DBName:               "buffet",
 		AllowNativePasswords: true,
 	}
@@ -34,21 +32,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	user := &entity.User{
-		ID:        1,
-		Username:  "watsuk",
-		Password:  "1234",
-		Email:     "test@gmail.com",
-		Role:      1,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
+	user := &entity.User{}
+	mux := handler.NewHandlerUser(db, user)
 
-	mux := handler.NewHandlerUser(user)
-
-	err = http.ListenAndServe(":8080", mux)
+	err = http.ListenAndServe(":3000", mux)
 	if err != nil {
-		fmt.Errorf("could not listen on port 8080 %v", err)
+		log.Fatalf("could not listen on port 3000: %v", err)
 		return
 	}
 

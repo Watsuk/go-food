@@ -1,4 +1,4 @@
-CREATE DATABASE-- MySQL dump 10.13  Distrib 5.7.33, for Win32 (AMD64)
+-- MySQL dump 10.13  Distrib 5.7.33, for Win32 (AMD64)
 --
 -- Host: localhost    Database: Data
 -- ------------------------------------------------------
@@ -15,8 +15,8 @@ CREATE DATABASE-- MySQL dump 10.13  Distrib 5.7.33, for Win32 (AMD64)
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-CREATE DATABASE IF NOT EXISTS 'buffet'
-USE 'buffet'
+CREATE DATABASE IF NOT EXISTS `buffet`;
+USE `buffet`;
 
 --
 -- Table structure for table `chart`
@@ -121,7 +121,7 @@ CREATE TABLE `trucks` (
   `name` varchar(256) NOT NULL,
   `slot_buffer` tinyint(3) unsigned NOT NULL,
   `opening` time NOT NULL,
-  `closing` time NOT NULL
+  `closing` time NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NULL DEFAULT NULL,
