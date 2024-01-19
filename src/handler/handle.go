@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/Watsuk/go-food/src/entity"
+	"github.com/Watsuk/go-food/src/http/users"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
@@ -13,6 +14,8 @@ func NewHandlerUser(user *entity.User) *HandlerUser {
 	}
 
 	handlers.Use(middleware.Logger)
+
+	handlers.Get("/users", users.GetUsersEndpoint())
 
 	return handlers
 }
