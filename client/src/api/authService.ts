@@ -1,5 +1,6 @@
 // authService.ts
-const API_URL = "URL_API";
+const API_URL = "http://localhost:3000";
+
 
 export const signin = async (email: string, password: string) => {
     const response = await fetch(`${API_URL}/signin`, {
@@ -21,7 +22,7 @@ export const register = async (userName: string, email: string, password: string
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userName, email, password }),
+        body: JSON.stringify({ username: userName, email, password }),
     });
     if (!response.ok) {
         throw new Error('Registration failed');

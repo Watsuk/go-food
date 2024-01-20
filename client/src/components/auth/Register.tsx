@@ -13,21 +13,26 @@ export default function Register() {
 
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
+        if (password !== confirmPassword) {
+            setMessage("Les mots de passe ne correspondent pas.");
+            return;
+        }
         try {
             const data = await register(userName, email, password);
             if (data) {
-                setMessage('Register successful');
+                setMessage("Register successful");
             }
         } catch (error) {
-            setMessage(error instanceof Error ? error.message : 'Unknown error');
+            setMessage(error instanceof Error ? error.message : "Unknown error");
         }
     };
+
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
                 <Label>Username</Label>
                 <Input
-                    value={email}
+                    value={userName}
                     onChange={(e) => setUserName(e.target.value)}
                     placeholder="Enter your username"
                     type="text"
