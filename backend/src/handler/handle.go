@@ -38,6 +38,9 @@ func NewHandlerUser(db *sql.DB, user *entity.User) *HandlerUser {
 	handlers.Post("/login", myhttp.LoginEndpoint(db))
 	handlers.Delete("/delete-account/{userID:[0-9]+}", myhttp.DeleteAccountEndpoint(db))
 
+	handlers.Post("/create-truck", myhttp.CreateTrucksEndpoint(db))
+	handlers.Delete("/delete-truck/{truckID:[0-9]+}", myhttp.DeleteTruckEndpoint(db))
+
 	return handlers
 }
 
