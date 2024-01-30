@@ -5,5 +5,5 @@ export default function App() {
     <div className="h-screen w-screen flex items-center justify-center">
       <AuthPage />
     </div>
-  )
+  );
 }

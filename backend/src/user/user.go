@@ -2,13 +2,16 @@ package user
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"time"
 
 	"github.com/Watsuk/go-food/src/entity"
+	"github.com/dgrijalva/jwt-go"
 	_ "github.com/go-sql-driver/mysql"
 )
+
 
 func GetUsers(db *sql.DB) ([]entity.User, error) {
 	rows, err := db.Query("SELECT * FROM users")
@@ -69,4 +72,37 @@ func CreateUser(db *sql.DB, userName string, password string, email string, role
 	}
 
 	return user, err
+}
+
+func Login(db *sql.DB, email, password string) (int64, string, error) {
+    var user entity.User
+	err := db.QueryRow("SELECT id, pw_hash FROM users WHERE email = ?", email).Scan(&user.ID, &user.Password)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return 0, "", errors.New("invalid email or password")
+
+        }
+        return 0, "", err
+    }
+
+    if password != user.Password {
+        return 0, "", errors.New("invalid email or password")
+    }
+
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+        "userId": user.ID,
+    })
+
+    tokenString, err := token.SignedString([]byte("SekretKey"))
+    if err != nil {
+        return 0, "", err
+    }
+
+    return user.ID, tokenString, nil
+}
+
+
+func DeleteUser(db *sql.DB, userID int64) error {
+    _, err := db.Exec("DELETE FROM users WHERE id = ?", userID)
+    return err
 }
