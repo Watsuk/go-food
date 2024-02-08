@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"net/http"
 
-	"github.com/Watsuk/go-food/src/base"
 	"github.com/Watsuk/go-food/src/entity"
 	myhttp "github.com/Watsuk/go-food/src/http"
 	"github.com/go-chi/chi"
@@ -12,7 +11,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func NewHandlerUser(db *sql.DB, ref base.Reference) *HandlerReference {
+func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
 
 	handlers := &HandlerReference{
 		chi.NewRouter(),
@@ -45,7 +44,9 @@ func NewHandlerUser(db *sql.DB, ref base.Reference) *HandlerReference {
 	handlers.Post("/create-truck", myhttp.CreateTrucksEndpoint(db))
 	handlers.Delete("/delete-truck/{truckID:[0-9]+}", myhttp.DeleteTruckEndpoint(db))
 
-	handlers.Post("order/accept/{orderID:[0-9]+}/{accept:[0-1]}", myhttp.AcceptOrderEndpoint(db))
+	handlers.Post("/order/accept/{orderID:[0-9]+}/{accept:[0-1]}", myhttp.AcceptOrderEndpoint(db))
+
+	handlers.Get("/create/order/{truckID:[0-9]+}", myhttp.CreateOrderEndpoint(db))
 
 	return handlers
 }

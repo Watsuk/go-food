@@ -35,7 +35,7 @@ func GetUsersEndpoint(db *sql.DB) http.HandlerFunc {
 
 func CreateUserEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var newUser User
+		var newUser UserBody
 
 		err := json.NewDecoder(r.Body).Decode(&newUser)
 		if err != nil {
@@ -63,66 +63,64 @@ func CreateUserEndpoint(db *sql.DB) http.HandlerFunc {
 }
 
 func LoginEndpoint(db *sql.DB) http.HandlerFunc {
-    return func(w http.ResponseWriter, r *http.Request) {
-        var loginData struct {
-            Email    string `json:"email"`
-            Password string `json:"password"`
-        }
+	return func(w http.ResponseWriter, r *http.Request) {
+		var loginData struct {
+			Email    string `json:"email"`
+			Password string `json:"password"`
+		}
 
-        err := json.NewDecoder(r.Body).Decode(&loginData)
-        if err != nil {
-            http.Error(w, "Invalid request body", http.StatusBadRequest)
-            return
-        }
+		err := json.NewDecoder(r.Body).Decode(&loginData)
+		if err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
 
-        userID, token, err := user.Login(db, loginData.Email, loginData.Password)
-        if err != nil {
-            http.Error(w, err.Error(), http.StatusUnauthorized)
-            return
-        }
+		userID, token, err := user.Login(db, loginData.Email, loginData.Password)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
 
-        response := struct {
-            UserID int64  `json:"user_id"`
-            Token  string `json:"token"`
-        }{
-            UserID: userID,
-            Token:  token,
-        }
+		response := struct {
+			UserID int64  `json:"user_id"`
+			Token  string `json:"token"`
+		}{
+			UserID: userID,
+			Token:  token,
+		}
 
-        w.Header().Set("Content-Type", "application/json")
-        json.NewEncoder(w).Encode(response)
-    }
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
 }
 
 func DeleteAccountEndpoint(db *sql.DB) http.HandlerFunc {
-    return func(w http.ResponseWriter, r *http.Request) {
-        userIDToDelete := chi.URLParam(r, "userID")
+	return func(w http.ResponseWriter, r *http.Request) {
+		userIDToDelete := chi.URLParam(r, "userID")
 
-        if userIDToDelete == "" {
-            http.Error(w, "Invalid user ID", http.StatusBadRequest)
-            return
-        }
+		if userIDToDelete == "" {
+			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+			return
+		}
 
-        userID, err := strconv.ParseInt(userIDToDelete, 10, 64)
-        if err != nil {
-            http.Error(w, "Invalid user ID", http.StatusBadRequest)
-            return
-        }
+		userID, err := strconv.ParseInt(userIDToDelete, 10, 64)
+		if err != nil {
+			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+			return
+		}
 
-        err = user.DeleteUser(db, userID)
-        if err != nil {
-            http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-            return
-        }
+		err = user.DeleteUser(db, userID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
 
-        w.WriteHeader(http.StatusOK)
-        fmt.Fprintln(w, "User account deleted successfully")
-    }
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, "User account deleted successfully")
+	}
 }
 
-
-
-type User struct {
+type UserBody struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
