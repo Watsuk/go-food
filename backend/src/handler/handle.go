@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 
+	"github.com/Watsuk/go-food/src/base"
 	"github.com/Watsuk/go-food/src/entity"
 	myhttp "github.com/Watsuk/go-food/src/http"
 	"github.com/go-chi/chi"
@@ -11,11 +12,14 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func NewHandlerUser(db *sql.DB, user *entity.User) *HandlerUser {
+func NewHandlerUser(db *sql.DB, ref base.Reference) *HandlerReference {
 
-	handlers := &HandlerUser{
+	handlers := &HandlerReference{
 		chi.NewRouter(),
-		user,
+		ref.User,
+		ref.Truck,
+		ref.Chart,
+		ref.Order,
 	}
 
 	// Cors middleware, the goal is to allow the front-end to access the API
@@ -41,10 +45,15 @@ func NewHandlerUser(db *sql.DB, user *entity.User) *HandlerUser {
 	handlers.Post("/create-truck", myhttp.CreateTrucksEndpoint(db))
 	handlers.Delete("/delete-truck/{truckID:[0-9]+}", myhttp.DeleteTruckEndpoint(db))
 
+	handlers.Post("order/accept/{orderID:[0-9]+}/{accept:[0-1]}", myhttp.AcceptOrderEndpoint(db))
+
 	return handlers
 }
 
-type HandlerUser struct {
+type HandlerReference struct {
 	*chi.Mux
-	user *entity.User
+	user  *entity.User
+	truck *entity.Truck
+	chart *entity.Chart
+	order *entity.Order
 }

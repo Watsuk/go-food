@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Watsuk/go-food/src/base"
 	"github.com/Watsuk/go-food/src/entity"
 	"github.com/Watsuk/go-food/src/handler"
 	"github.com/go-sql-driver/mysql"
@@ -31,9 +32,13 @@ func main() {
 	if err := db.Ping(); err != nil {
 		log.Fatal(err)
 	}
+	var reference base.Reference
+	reference.User = &entity.User{}
+	reference.Truck = &entity.Truck{}
+	reference.Chart = &entity.Chart{}
+	reference.Order = &entity.Order{}
 
-	user := &entity.User{}
-	mux := handler.NewHandlerUser(db, user)
+	mux := handler.NewHandlerUser(db, reference)
 
 	err = http.ListenAndServe(":3000", mux)
 	if err != nil {

@@ -7,6 +7,7 @@ type Order struct {
 	UserID    int64     `json:"user_id"`
 	TruckID   int64     `json:"truck_id"`
 	Price     int64     `json:"price"`
+	Accepted  bool      `json:"accepted"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
