@@ -30,7 +30,7 @@ CREATE TABLE `chart` (
   `truck_id` int(11) NOT NULL,
   `label` varchar(64) NOT NULL,
   `description` text,
-  `price` float NOT NULL,
+  `price` int(6) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NULL DEFAULT NULL,
@@ -50,35 +50,6 @@ LOCK TABLES `chart` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `order_detail`
---
-
-DROP TABLE IF EXISTS `order_detail`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `order_detail` (
-  `order_id` int(11) NOT NULL,
-  `consumable_id` int(11) NOT NULL,
-  `quantity` int(11) NOT NULL DEFAULT '1',
-  `comment` text,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  KEY `detail_order_id_idx` (`order_id`),
-  KEY `detail_consumable_id_idx` (`consumable_id`),
-  CONSTRAINT `detail_consumable_id` FOREIGN KEY (`consumable_id`) REFERENCES `chart` (`consumable_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `detail_order_id` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping buffet for table `order_detail`
---
-
-LOCK TABLES `order_detail` WRITE;
-/*!40000 ALTER TABLE `order_detail` DISABLE KEYS */;
-/*!40000 ALTER TABLE `order_detail` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `orders`
 --
 
@@ -92,6 +63,7 @@ CREATE TABLE `orders` (
   `price` float NOT NULL,
   `hours` timestamp NOT NULL,
   'accepted' boolean NOT NULL DEFAULT FALSE,
+  `order_data` json NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NULL DEFAULT NULL,
@@ -121,6 +93,7 @@ DROP TABLE IF EXISTS `trucks`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `trucks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
   `name` varchar(256) NOT NULL,
   `slot_buffer` tinyint(3) unsigned NOT NULL,
   `opening` time NOT NULL,
@@ -129,6 +102,8 @@ CREATE TABLE `trucks` (
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
+  KEY `trucks_user_id_idx` (`user_id`),
+  CONSTRAINT `truck_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
