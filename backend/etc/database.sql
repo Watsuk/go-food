@@ -63,7 +63,6 @@ CREATE TABLE `orders` (
   `price` float NOT NULL,
   `hours` timestamp NOT NULL,
   'accepted' boolean NOT NULL DEFAULT FALSE,
-  `order_data` json NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NULL DEFAULT NULL,

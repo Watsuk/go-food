@@ -47,6 +47,7 @@ func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
 	handlers.Post("/order/accept/{orderID:[0-9]+}/{accept:[0-1]}", myhttp.AcceptOrderEndpoint(db))
 
 	handlers.Get("/create/order/{truckID:[0-9]+}", myhttp.CreateOrderEndpoint(db))
+	handlers.Get("/charts", myhttp.GetChartsEndpoint(db))
 
 	return handlers
 }
