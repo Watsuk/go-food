@@ -2,9 +2,12 @@ package http
 
 import (
 	"database/sql"
+	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
+	"github.com/Watsuk/go-food/src/entity"
 	"github.com/Watsuk/go-food/src/order"
 	"github.com/go-chi/chi"
 )
@@ -42,4 +45,43 @@ func AcceptOrderEndpoint(db *sql.DB) http.HandlerFunc {
 			w.Write([]byte("Order declined"))
 		}
 	}
+}
+
+func CreateOrderEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var newOrder OrderBody
+		err := json.NewDecoder(r.Body).Decode(&newOrder)
+		if err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		truckIDString := chi.URLParam(r, "truckID")
+		if truckIDString == "" {
+			http.Error(w, "Invalid truck ID", http.StatusBadRequest)
+			return
+		}
+
+		truckID, err := strconv.Atoi(truckIDString)
+		if err != nil {
+			http.Error(w, "Invalid truck ID", http.StatusBadRequest)
+			return
+		}
+
+		order, err := order.CreateOrder(db, newOrder.UserID, truckID, newOrder.Products, newOrder.Quantity, newOrder.Comment, newOrder.Hour)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		w.Write([]byte("Order created with ID: " + strconv.Itoa(int(order.ID))))
+	}
+}
+
+type OrderBody struct {
+	UserID   int            `json:"user_id"`
+	TruckID  int            `json:"truck_id"`
+	Products []entity.Chart `json:"product"`
+	Quantity []int          `json:"quantity"`
+	Comment  string         `json:"comment"`
+	Hour     time.Time      `json:"hour"`
 }
