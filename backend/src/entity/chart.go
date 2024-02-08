@@ -3,7 +3,7 @@ package entity
 import "time"
 
 type Chart struct {
-	ConsomableID int64     `json:"consomable_id"`
+	ConsomableID int64     `json:"consumable_id"`
 	TruckID      int64     `json:"truck_id"`
 	Label        string    `json:"label"`
 	Description  string    `json:"description"`

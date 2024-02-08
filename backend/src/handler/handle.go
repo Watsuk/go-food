@@ -45,7 +45,8 @@ func NewHandlerUser(db *sql.DB, ref base.Reference) *HandlerReference {
 	handlers.Post("/create-truck", myhttp.CreateTrucksEndpoint(db))
 	handlers.Delete("/delete-truck/{truckID:[0-9]+}", myhttp.DeleteTruckEndpoint(db))
 
-	handlers.Post("order/accept/{orderID:[0-9]+}/{accept:[0-1]}", myhttp.AcceptOrderEndpoint(db))
+	handlers.Post("/order/accept/{orderID:[0-9]+}/{accept:[0-1]}", myhttp.AcceptOrderEndpoint(db))
+	handlers.Get("/charts", myhttp.GetChartsEndpoint(db))
 
 	return handlers
 }
