@@ -19,14 +19,14 @@ CREATE DATABASE IF NOT EXISTS `buffet`;
 USE `buffet`;
 
 --
--- Table structure for table `chart`
+-- Table structure for table `product`
 --
 
-DROP TABLE IF EXISTS `chart`;
+DROP TABLE IF EXISTS `product`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `chart` (
-  `consumable_id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `product` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `truck_id` int(11) NOT NULL,
   `label` varchar(64) NOT NULL,
   `description` text,
@@ -34,19 +34,19 @@ CREATE TABLE `chart` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`consumable_id`),
+  PRIMARY KEY (`id`),
   KEY `consumable_truck_id_idx` (`truck_id`),
   CONSTRAINT `consumable_truck_id` FOREIGN KEY (`truck_id`) REFERENCES `trucks` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping buffet for table `chart`
+-- Dumping buffet for table `product`
 --
 
-LOCK TABLES `chart` WRITE;
-/*!40000 ALTER TABLE `chart` DISABLE KEYS */;
-/*!40000 ALTER TABLE `chart` ENABLE KEYS */;
+LOCK TABLES `product` WRITE;
+/*!40000 ALTER TABLE `product` DISABLE KEYS */;
+/*!40000 ALTER TABLE `product` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -62,7 +62,7 @@ CREATE TABLE `orders` (
   `truck_id` int(11) NOT NULL,
   `price` float NOT NULL,
   `hours` timestamp NOT NULL,
-  'accepted' boolean NOT NULL DEFAULT FALSE,
+  `accepted` boolean NOT NULL DEFAULT FALSE,
   `order_data` json NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -101,9 +101,9 @@ CREATE TABLE `trucks` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
   KEY `trucks_user_id_idx` (`user_id`),
-  CONSTRAINT `truck_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `truck_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
