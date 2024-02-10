@@ -11,6 +11,8 @@ type Order struct {
 	Price     int64     `json:"price"`
 	Accepted  bool      `json:"accepted"`
 	OrderData OrderData `json:"order_data"`
+	Status    string    `json:"status"`
+	Hours     time.Time `json:"hour"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	DeletedAt time.Time `json:"deleted_at"`

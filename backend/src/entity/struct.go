@@ -1,13 +1,13 @@
 package entity
 
 type Reference struct {
-	User  *User
-	Truck *Truck
-	Chart *Chart
-	Order *Order
+	User    *User
+	Truck   *Truck
+	Product *Product
+	Order   *Order
 }
 
-type Product struct {
-	ProductID Chart `json:"product_id"`
-	Quantity  int64 `json:"quantity"`
+type Products struct {
+	Product  Product `json:"product_id"`
+	Quantity int64   `json:"quantity"`
 }
