@@ -1,15 +1,21 @@
 import { Truck } from "@/types/type";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState } from "react";
 
 function TruckList({
-  currentTruck,
   onTruckSelect,
   truckData,
 }: {
-  currentTruck: Truck | null;
   onTruckSelect: (truckId: number) => void;
   truckData: Truck[];
 }) {
+  const [selectedTruck, setSelectedTruck] = useState<number | null>(null);
+
+  const handleTruckSelect = (truckId: number) => {
+    onTruckSelect(truckId);
+    setSelectedTruck(truckId);
+  };
+
   return (
     <ScrollArea className="h-full w-1/4 border border-gray-300 rounded-lg overflow-hidden">
       {truckData.length === 0 && (
@@ -20,8 +26,13 @@ function TruckList({
       {truckData.map((truck) => (
         <div
           key={truck.id}
-          onClick={() => onTruckSelect(truck.id)}
-          className="flex flex-col items-start justify-center gap-4 p-4 border border-gray-300 w-full hover:bg-gray-100 cursor-pointer"
+          onClick={() => handleTruckSelect(truck.id)}
+          className={`flex flex-col items-start justify-center gap-4 p-4 border border-gray-300 w-full hover:bg-gray-100 cursor-pointer
+           ${
+             truck.id === selectedTruck &&
+             "hover:bg-gray-700 cursor-pointer bg-black text-white"
+           }
+              `}
         >
           <h3>{truck.name}</h3>
           <span className="flex gap-4">
