@@ -37,7 +37,7 @@ func main() {
 	reference.Product = &entity.Product{}
 	reference.Order = &entity.Order{}
 
-	mux := handler.NewHandlerUser(db, reference)
+	mux := handler.NewHandler(db, reference)
 
 	err = http.ListenAndServe(":3000", mux)
 	if err != nil {

@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
+func NewHandler(db *sql.DB, ref entity.Reference) *HandlerReference {
 
 	handlers := &HandlerReference{
 		chi.NewRouter(),
@@ -59,7 +59,7 @@ func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
 
 	handlers.Patch("/users/{userID:[0-9]+}", myhttp.AdminEditEndpoint(db))
 	handlers.Delete("/users/{userID:[0-9]+}", myhttp.AdminDeleteEndpoint(db))
-  
+
 	handlers.Get("/trucks", myhttp.GetTrucksEndpoint(db))
 	handlers.Get("/trucks/{truckID:[0-9]+}", myhttp.GetTruckByIDEndpoint(db))
 	handlers.Get("/trucks/user/{userID:[0-9]+}", myhttp.GetTrucksByUserIDEndpoint(db))
