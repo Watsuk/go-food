@@ -144,11 +144,6 @@ func Login(db *sql.DB, email, password string) (int64, string, error) {
 		return 0, "", err
 	}
 
-	// tokenString, err := token.SignedString([]byte("SecretKey"))
-	// if err != nil {
-	// 	return 0, "", err
-	// }
-
 	return user.ID, token, nil
 }
 
