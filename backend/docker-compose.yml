@@ -20,7 +20,7 @@ services:
       - ./etc/database.sql:/docker-entrypoint-initdb.d/dump.sql
       - db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized"]
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-p${DB_PASS}","--silent"]
       interval: 5s
       timeout: 5s
       retries: 5

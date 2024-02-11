@@ -32,7 +32,7 @@ func AdminEditEndpoint(db *sql.DB) http.HandlerFunc {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		w.WriteHeader(http.StatusNoContent)
+		w.Write([]byte("User edited"))
 	}
 }
 
@@ -55,7 +55,7 @@ func AdminDeleteEndpoint(db *sql.DB) http.HandlerFunc {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		w.WriteHeader(http.StatusNoContent)
+		w.Write([]byte("User deleted"))
 	}
 }
 
