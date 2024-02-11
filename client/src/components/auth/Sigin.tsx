@@ -15,7 +15,10 @@ export default function Sigin() {
       const data = await signin(email, password);
       if (data) {
         setMessage("Signin successful");
-        // localStorage.setItem("JWT_TOKEN", data.token);
+        localStorage.setItem("token", data.token);
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 2000);
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unknown error");
