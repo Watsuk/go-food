@@ -8,14 +8,13 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Watsuk/go-food/src/entity"
 	"github.com/Watsuk/go-food/src/truck"
 	"github.com/go-chi/chi"
 )
 
 func CreateTrucksEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var newTruck entity.Truck // On crée une variable de type Truck
+		var newTruck newTruck // On crée une variable de type Truck
 		err := json.NewDecoder(r.Body).Decode(&newTruck)
 
 		if err != nil {
@@ -24,7 +23,7 @@ func CreateTrucksEndpoint(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		truck, err := truck.CreateTruck(db, newTruck.Name, newTruck.SlotBuffer, newTruck.OpenTime, newTruck.CloseTime)
+		truck, err := truck.CreateTruck(db, newTruck.Name, newTruck.UserID, newTruck.SlotBuffer, newTruck.OpenTime, newTruck.CloseTime)
 
 		if err != nil {
 			log.Printf("Erreur lors la création du camion : %v", err)
@@ -68,4 +67,12 @@ func DeleteTruckEndpoint(db *sql.DB) http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintln(w, "truck deleted successfully")
 	}
+}
+
+type newTruck struct {
+	Name       string `json:"name"`
+	UserID     int64  `json:"user_id"`
+	SlotBuffer int64  `json:"slot_buffer"`
+	OpenTime   string `json:"open_time"`
+	CloseTime  string `json:"close_time"`
 }

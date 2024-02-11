@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Watsuk/go-food/src/entity"
 	"github.com/Watsuk/go-food/src/order"
 	"github.com/go-chi/chi"
 )
@@ -56,19 +55,7 @@ func CreateOrderEndpoint(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		truckIDString := chi.URLParam(r, "truckID")
-		if truckIDString == "" {
-			http.Error(w, "Invalid truck ID", http.StatusBadRequest)
-			return
-		}
-
-		truckID, err := strconv.Atoi(truckIDString)
-		if err != nil {
-			http.Error(w, "Invalid truck ID", http.StatusBadRequest)
-			return
-		}
-
-		order, err := order.CreateOrder(db, newOrder.UserID, truckID, newOrder.Products, newOrder.Quantity, newOrder.Comment, newOrder.Hour)
+		order, err := order.CreateOrder(db, newOrder.UserID, newOrder.TruckID, newOrder.Products, newOrder.Quantity, newOrder.Comment, newOrder.Hour)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
@@ -77,11 +64,34 @@ func CreateOrderEndpoint(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+func GetOrdersByIdEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		orderIDString := chi.URLParam(r, "orderID")
+		if orderIDString == "" {
+			http.Error(w, "Invalid order ID", http.StatusBadRequest)
+			return
+		}
+
+		orderID, err := strconv.Atoi(orderIDString)
+		if err != nil {
+			http.Error(w, "Invalid order ID", http.StatusBadRequest)
+			return
+		}
+
+		order, err := order.GetOrderById(db, orderID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(order)
+	}
+}
+
 type OrderBody struct {
-	UserID   int            `json:"user_id"`
-	TruckID  int            `json:"truck_id"`
-	Products []entity.Chart `json:"product"`
-	Quantity []int          `json:"quantity"`
-	Comment  string         `json:"comment"`
-	Hour     time.Time      `json:"hour"`
+	UserID   int       `json:"user_id"`
+	TruckID  int       `json:"truck_id"`
+	Products []int     `json:"product"`
+	Quantity []int     `json:"quantity"`
+	Comment  string    `json:"comment"`
+	Hour     time.Time `json:"hour"`
 }

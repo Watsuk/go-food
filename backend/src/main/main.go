@@ -34,7 +34,7 @@ func main() {
 	var reference entity.Reference
 	reference.User = &entity.User{}
 	reference.Truck = &entity.Truck{}
-	reference.Chart = &entity.Chart{}
+	reference.Product = &entity.Product{}
 	reference.Order = &entity.Order{}
 
 	mux := handler.NewHandlerUser(db, reference)

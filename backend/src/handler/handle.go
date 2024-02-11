@@ -17,7 +17,7 @@ func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
 		chi.NewRouter(),
 		ref.User,
 		ref.Truck,
-		ref.Chart,
+		ref.Product,
 		ref.Order,
 	}
 
@@ -45,9 +45,11 @@ func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
 	handlers.Delete("/delete-truck/{truckID:[0-9]+}", myhttp.DeleteTruckEndpoint(db))
 
 	handlers.Post("/order/accept/{orderID:[0-9]+}/{accept:[0-1]}", myhttp.AcceptOrderEndpoint(db))
+	handlers.Get("/order/{orderID:[0-9]+}", myhttp.GetOrdersByIdEndpoint(db))
+	handlers.Post("/order", myhttp.CreateOrderEndpoint(db))
 
-	handlers.Get("/create/order/{truckID:[0-9]+}", myhttp.CreateOrderEndpoint(db))
-
+	handlers.Post("/product", myhttp.CreateProductEndpoint(db))
+	handlers.Get("/product/{productID:[0-9]+}", myhttp.GetProductByIdEndpoint(db))
 	return handlers
 }
 
@@ -55,6 +57,6 @@ type HandlerReference struct {
 	*chi.Mux
 	user  *entity.User
 	truck *entity.Truck
-	chart *entity.Chart
+	chart *entity.Product
 	order *entity.Order
 }
