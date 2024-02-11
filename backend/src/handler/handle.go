@@ -24,7 +24,7 @@ func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
 	// Cors middleware, the goal is to allow the front-end to access the API
 	handlers.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:5173"}, // Met l'URL de ton front-end ici
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
@@ -44,9 +44,14 @@ func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
 	handlers.Post("/create-truck", myhttp.CreateTrucksEndpoint(db))
 	handlers.Delete("/delete-truck/{truckID:[0-9]+}", myhttp.DeleteTruckEndpoint(db))
 
-	handlers.Post("/order/accept/{orderID:[0-9]+}/{accept:[0-1]}", myhttp.AcceptOrderEndpoint(db))
+	handlers.Patch("/order/accept/{orderID:[0-9]+}/{accept:[0-1]}", myhttp.AcceptOrderEndpoint(db))
 	handlers.Get("/order/{orderID:[0-9]+}", myhttp.GetOrdersByIdEndpoint(db))
 	handlers.Post("/order", myhttp.CreateOrderEndpoint(db))
+	handlers.Get("/orders/truck/{truckID:[0-9]+}", myhttp.GetOrdersByTruckEndpoint(db))
+	handlers.Get("/orders/user/{userID:[0-9]+}", myhttp.GetOrdersByUserEndpoint(db))
+	handlers.Get("/orders", myhttp.GetOrdersEndpoint(db))
+	handlers.Patch("/order/{orderID:[0-9]+}/completed", myhttp.CompletedOrderEndpoint(db))
+	handlers.Patch("/order/{orderID:[0-9]+}/handedover", myhttp.HandedOverOrderEndpoint(db))
 
 	handlers.Post("/product", myhttp.CreateProductEndpoint(db))
 	handlers.Get("/product/{productID:[0-9]+}", myhttp.GetProductByIdEndpoint(db))

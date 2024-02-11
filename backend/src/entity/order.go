@@ -9,7 +9,6 @@ type Order struct {
 	UserID    int64     `json:"user_id"`
 	TruckID   int64     `json:"truck_id"`
 	Price     int64     `json:"price"`
-	Accepted  bool      `json:"accepted"`
 	OrderData OrderData `json:"order_data"`
 	Status    string    `json:"status"`
 	Hours     time.Time `json:"hour"`
