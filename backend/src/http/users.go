@@ -33,6 +33,41 @@ func GetUsersEndpoint(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+func GetUserByIdEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Récupérer l'ID de l'utilisateur
+		userIDString := chi.URLParam(r, "userID")
+
+		// Convertir l'ID de l'utilisateur en entier
+		userID, err := strconv.Atoi(userIDString)
+		if err != nil {
+			http.Error(w, "Invalid User ID", http.StatusBadRequest)
+			return
+		}
+
+		// Récupérer l'utilisateur par son ID
+		user, err := user.GetUserByID(db, userID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		if user == nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		// Convertir l'utilisateur en JSON et envoyer la réponse
+		jsonUser, err := json.Marshal(user)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonUser)
+	}
+}
+
 func CreateUserEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var newUser UserBody
