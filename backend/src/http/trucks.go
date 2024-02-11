@@ -69,6 +69,115 @@ func DeleteTruckEndpoint(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+func GetTrucksEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		trucks, err := truck.GetTrucks(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		jsonTrucks, err := json.Marshal(trucks)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonTrucks)
+	}
+}
+
+func GetTruckByIDEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		truckIDString := chi.URLParam(r, "truckID")
+		if truckIDString == "" {
+			http.Error(w, "Invalid truck ID", http.StatusBadRequest)
+			return
+		}
+
+		truckID, err := strconv.ParseInt(truckIDString, 10, 64)
+		if err != nil {
+			http.Error(w, "Invalid truck ID", http.StatusBadRequest)
+			return
+		}
+
+		truck, err := truck.GetTruckByID(db, truckID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		jsonTruck, err := json.Marshal(truck)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonTruck)
+	}
+}
+
+func GetTrucksByUserIDEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userIDString := chi.URLParam(r, "userID")
+		if userIDString == "" {
+			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+			return
+		}
+
+		userID, err := strconv.ParseInt(userIDString, 10, 64)
+		if err != nil {
+			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+			return
+		}
+
+		trucks, err := truck.GetTrucksByUserID(db, userID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		jsonTrucks, err := json.Marshal(trucks)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonTrucks)
+	}
+}
+
+func EditTruckEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		truckIDString := chi.URLParam(r, "truckID")
+		var newTruck newTruck
+		err := json.NewDecoder(r.Body).Decode(&newTruck)
+
+		if truckIDString == "" || err != nil {
+			http.Error(w, "Invalid truck ID or data", http.StatusBadRequest)
+			return
+		}
+
+		truckID, err := strconv.ParseInt(truckIDString, 10, 64)
+		if err != nil {
+			http.Error(w, "Invalid truck ID", http.StatusBadRequest)
+			return
+		}
+
+		err = truck.EditTruck(db, truckID, newTruck.Name, newTruck.UserID, newTruck.SlotBuffer, newTruck.OpenTime, newTruck.CloseTime)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		w.Write([]byte("Truck edited"))
+	}
+}
+
+
 type newTruck struct {
 	Name       string `json:"name"`
 	UserID     int64  `json:"user_id"`
