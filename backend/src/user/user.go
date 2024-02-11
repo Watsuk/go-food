@@ -12,7 +12,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-
 func GetUsers(db *sql.DB) ([]entity.User, error) {
 	rows, err := db.Query("SELECT * FROM users")
 	if err != nil {
@@ -74,35 +73,50 @@ func CreateUser(db *sql.DB, userName string, password string, email string, role
 	return user, err
 }
 
-func Login(db *sql.DB, email, password string) (int64, string, error) {
-    var user entity.User
-	err := db.QueryRow("SELECT id, pw_hash FROM users WHERE email = ?", email).Scan(&user.ID, &user.Password)
-    if err != nil {
-        if err == sql.ErrNoRows {
-            return 0, "", errors.New("invalid email or password")
+func GetUserByID(db *sql.DB, id int) (*entity.User, error) {
+	rows := db.QueryRow("SELECT * FROM users WHERE id = ?", id)
 
-        }
-        return 0, "", err
-    }
+	var user entity.User
 
-    if password != user.Password {
-        return 0, "", errors.New("invalid email or password")
-    }
+	err := rows.Scan(&user.ID, &user.Username, &user.Password, &user.Email, &user.Role)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		log.Fatal(err)
+	}
 
-    token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-        "userId": user.ID,
-    })
-
-    tokenString, err := token.SignedString([]byte("SekretKey"))
-    if err != nil {
-        return 0, "", err
-    }
-
-    return user.ID, tokenString, nil
+	return &user, nil
 }
 
+func Login(db *sql.DB, email, password string) (int64, string, error) {
+	var user entity.User
+	err := db.QueryRow("SELECT id, pw_hash FROM users WHERE email = ?", email).Scan(&user.ID, &user.Password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, "", errors.New("invalid email or password")
+
+		}
+		return 0, "", err
+	}
+
+	if password != user.Password {
+		return 0, "", errors.New("invalid email or password")
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"userId": user.ID,
+	})
+
+	tokenString, err := token.SignedString([]byte("SekretKey"))
+	if err != nil {
+		return 0, "", err
+	}
+
+	return user.ID, tokenString, nil
+}
 
 func DeleteUser(db *sql.DB, userID int64) error {
-    _, err := db.Exec("DELETE FROM users WHERE id = ?", userID)
-    return err
+	_, err := db.Exec("DELETE FROM users WHERE id = ?", userID)
+	return err
 }
