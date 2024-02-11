@@ -137,6 +137,11 @@ func Login(db *sql.DB, email, password string) (int64, string, error) {
 	return user.ID, tokenString, nil
 }
 
+func EditUser(db *sql.DB, userID int64, username string, email string, role int) error {
+	_, err := db.Exec("UPDATE users SET username = ?, email = ?, permissions = ? WHERE id = ?", username, email, role, userID)
+	return err
+}
+
 func DeleteUser(db *sql.DB, userID int64) error {
 	_, err := db.Exec("DELETE FROM users WHERE id = ?", userID)
 	return err
