@@ -8,14 +8,25 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Watsuk/go-food/src/auth"
+	"github.com/Watsuk/go-food/src/permissions"
 	"github.com/Watsuk/go-food/src/truck"
 	"github.com/go-chi/chi"
 )
 
 func CreateTrucksEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.Restaurateur, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		var newTruck newTruck // On crée une variable de type Truck
-		err := json.NewDecoder(r.Body).Decode(&newTruck)
+		err = json.NewDecoder(r.Body).Decode(&newTruck)
 
 		if err != nil {
 			log.Printf("Erreur de décodage JSON : %v", err)
@@ -45,6 +56,15 @@ func CreateTrucksEndpoint(db *sql.DB) http.HandlerFunc {
 
 func DeleteTruckEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.Restaurateur, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		truckIDToDelete := chi.URLParam(r, "truckID")
 
 		if truckIDToDelete == "" {
@@ -71,6 +91,15 @@ func DeleteTruckEndpoint(db *sql.DB) http.HandlerFunc {
 
 func GetTrucksEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.User, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		trucks, err := truck.GetTrucks(db)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -90,6 +119,15 @@ func GetTrucksEndpoint(db *sql.DB) http.HandlerFunc {
 
 func GetTruckByIDEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.User, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		truckIDString := chi.URLParam(r, "truckID")
 		if truckIDString == "" {
 			http.Error(w, "Invalid truck ID", http.StatusBadRequest)
@@ -121,6 +159,15 @@ func GetTruckByIDEndpoint(db *sql.DB) http.HandlerFunc {
 
 func GetTrucksByUserIDEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.Admin, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		userIDString := chi.URLParam(r, "userID")
 		if userIDString == "" {
 			http.Error(w, "Invalid user ID", http.StatusBadRequest)
@@ -152,9 +199,18 @@ func GetTrucksByUserIDEndpoint(db *sql.DB) http.HandlerFunc {
 
 func EditTruckEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.Restaurateur, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		truckIDString := chi.URLParam(r, "truckID")
 		var newTruck newTruck
-		err := json.NewDecoder(r.Body).Decode(&newTruck)
+		err = json.NewDecoder(r.Body).Decode(&newTruck)
 
 		if truckIDString == "" || err != nil {
 			http.Error(w, "Invalid truck ID or data", http.StatusBadRequest)
@@ -176,7 +232,6 @@ func EditTruckEndpoint(db *sql.DB) http.HandlerFunc {
 		w.Write([]byte("Truck edited"))
 	}
 }
-
 
 type newTruck struct {
 	Name       string `json:"name"`

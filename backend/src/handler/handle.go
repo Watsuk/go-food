@@ -56,6 +56,7 @@ func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
 
 	handlers.Post("/product", myhttp.CreateProductEndpoint(db))
 	handlers.Get("/product/{productID:[0-9]+}", myhttp.GetProductByIdEndpoint(db))
+	handlers.Get("/products/truck/{truckID:[0-9]+}", myhttp.GetProductsByTruckEndpoint(db))
 
 	handlers.Patch("/users/{userID:[0-9]+}", myhttp.AdminEditEndpoint(db))
 	handlers.Delete("/users/{userID:[0-9]+}", myhttp.AdminDeleteEndpoint(db))
