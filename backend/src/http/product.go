@@ -22,7 +22,7 @@ func CreateProductEndpoint(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		product, err := product.CreateProduct(db, newProduct.TruckID, newProduct.Label, newProduct.Description, newProduct.Price)
+		product, err := product.CreateProduct(db, newProduct.TruckID, newProduct.Name, newProduct.Label, newProduct.Description, newProduct.Price)
 
 		if err != nil {
 			log.Printf("Erreur lors la création du product : %v", err)
@@ -67,8 +67,34 @@ func GetProductByIdEndpoint(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+func GetProductsByTruckEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		truckIDString := chi.URLParam(r, "truckID")
+
+		truckID, err := strconv.Atoi(truckIDString)
+
+		products, err := product.GetProductsByTruckID(db, int64(truckID))
+
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		jsonProducts, err := json.Marshal(products)
+
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonProducts)
+	}
+}
+
 type newProduct struct {
 	TruckID     int    `json:"truckID"`
+	Name        string `json:"name"`
 	Label       string `json:"label"`
 	Description string `json:"description"`
 	Price       int    `json:"price"`

@@ -90,7 +90,8 @@ DROP TABLE IF EXISTS `product`;
 CREATE TABLE `product` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `truck_id` int(11) NOT NULL,
-  `label` varchar(64) NOT NULL,
+  `name` varchar(64) NOT NULL,
+  `label` varchar(256) NOT NULL,
   `description` text,
   `price` int(6) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
