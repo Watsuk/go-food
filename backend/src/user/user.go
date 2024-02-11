@@ -55,17 +55,38 @@ func GetUsers(db *sql.DB) ([]entity.User, error) {
 	return users, err
 }
 
-func GetUserByID(db *sql.DB, id int) (*entity.User, error) {
-	rows := db.QueryRow("SELECT * FROM users WHERE id = ?", id)
+func GetUserByID(db *sql.DB, userID int) (*entity.User, error) {
+	row := db.QueryRow("SELECT * FROM users WHERE id = ?", userID)
 
 	var user entity.User
+	var createdAt, updatedAt, deletedAt []uint8
 
-	err := rows.Scan(&user.ID, &user.Username, &user.Password, &user.Email, &user.Role)
+	err := row.Scan(&user.ID, &user.Username, &user.Password, &user.Email, &user.Role, &createdAt, &updatedAt, &deletedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		log.Fatal(err)
+	}
+
+	createdAtString := string(createdAt)
+	user.CreatedAt, err = time.Parse("2006-01-02 15:04:05", createdAtString)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	updatedAtString := string(updatedAt)
+	user.UpdatedAt, err = time.Parse("2006-01-02 15:04:05", updatedAtString)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if deletedAt != nil {
+		deletedAtString := string(deletedAt)
+		user.DeletedAt, err = time.Parse("2006-01-02 15:04:05", deletedAtString)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	return &user, nil
