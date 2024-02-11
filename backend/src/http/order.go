@@ -8,12 +8,23 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Watsuk/go-food/src/auth"
 	"github.com/Watsuk/go-food/src/order"
+	"github.com/Watsuk/go-food/src/permissions"
 	"github.com/go-chi/chi"
 )
 
 func AcceptOrderEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.Restaurateur, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		orderIDString := chi.URLParam(r, "orderID")
 		acceptString := chi.URLParam(r, "accept")
 
@@ -49,8 +60,17 @@ func AcceptOrderEndpoint(db *sql.DB) http.HandlerFunc {
 
 func CreateOrderEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.User, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		var newOrder OrderBody
-		err := json.NewDecoder(r.Body).Decode(&newOrder)
+		err = json.NewDecoder(r.Body).Decode(&newOrder)
 		if err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
@@ -67,6 +87,15 @@ func CreateOrderEndpoint(db *sql.DB) http.HandlerFunc {
 
 func GetOrdersByIdEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.User, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		orderIDString := chi.URLParam(r, "orderID")
 		if orderIDString == "" {
 			http.Error(w, "Invalid order ID", http.StatusBadRequest)
@@ -90,6 +119,15 @@ func GetOrdersByIdEndpoint(db *sql.DB) http.HandlerFunc {
 
 func GetOrdersByTruckEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.Restaurateur, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		truckIDString := chi.URLParam(r, "truckID")
 		if truckIDString == "" {
 			http.Error(w, "Invalid truck ID", http.StatusBadRequest)
@@ -113,6 +151,15 @@ func GetOrdersByTruckEndpoint(db *sql.DB) http.HandlerFunc {
 
 func GetOrdersByUserEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.User, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		userIDString := chi.URLParam(r, "userID")
 		if userIDString == "" {
 			http.Error(w, "Invalid user ID", http.StatusBadRequest)
@@ -136,6 +183,15 @@ func GetOrdersByUserEndpoint(db *sql.DB) http.HandlerFunc {
 
 func GetOrdersEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.Admin, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		orders, err := order.GetOrders(db)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -147,6 +203,15 @@ func GetOrdersEndpoint(db *sql.DB) http.HandlerFunc {
 
 func CompletedOrderEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.Restaurateur, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		orderIDString := chi.URLParam(r, "orderID")
 		if orderIDString == "" {
 			http.Error(w, "Invalid order ID", http.StatusBadRequest)
@@ -171,6 +236,15 @@ func CompletedOrderEndpoint(db *sql.DB) http.HandlerFunc {
 
 func HandedOverOrderEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.Restaurateur, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		orderIDString := chi.URLParam(r, "orderID")
 		if orderIDString == "" {
 			http.Error(w, "Invalid order ID", http.StatusBadRequest)
