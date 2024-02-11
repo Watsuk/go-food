@@ -3,6 +3,7 @@ package http
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -84,6 +85,110 @@ func GetOrdersByIdEndpoint(db *sql.DB) http.HandlerFunc {
 			return
 		}
 		json.NewEncoder(w).Encode(order)
+	}
+}
+
+func GetOrdersByTruckEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		truckIDString := chi.URLParam(r, "truckID")
+		if truckIDString == "" {
+			http.Error(w, "Invalid truck ID", http.StatusBadRequest)
+			return
+		}
+
+		truckID, err := strconv.Atoi(truckIDString)
+		if err != nil {
+			http.Error(w, "Invalid truck ID", http.StatusBadRequest)
+			return
+		}
+
+		orders, err := order.GetOrdersByTruck(db, truckID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(orders)
+	}
+}
+
+func GetOrdersByUserEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userIDString := chi.URLParam(r, "userID")
+		if userIDString == "" {
+			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+			return
+		}
+
+		userID, err := strconv.Atoi(userIDString)
+		if err != nil {
+			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+			return
+		}
+
+		orders, err := order.GetOrdersByUser(db, userID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(orders)
+	}
+}
+
+func GetOrdersEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		orders, err := order.GetOrders(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(orders)
+	}
+}
+
+func CompletedOrderEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		orderIDString := chi.URLParam(r, "orderID")
+		if orderIDString == "" {
+			http.Error(w, "Invalid order ID", http.StatusBadRequest)
+			return
+		}
+
+		orderID, err := strconv.Atoi(orderIDString)
+		if err != nil {
+			http.Error(w, "Invalid order ID", http.StatusBadRequest)
+			return
+		}
+
+		err = order.CompletedOrder(db, orderID)
+		if err != nil {
+			fmt.Println(err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		w.Write([]byte("Order completed"))
+	}
+}
+
+func HandedOverOrderEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		orderIDString := chi.URLParam(r, "orderID")
+		if orderIDString == "" {
+			http.Error(w, "Invalid order ID", http.StatusBadRequest)
+			return
+		}
+
+		orderID, err := strconv.Atoi(orderIDString)
+		if err != nil {
+			http.Error(w, "Invalid order ID", http.StatusBadRequest)
+			return
+		}
+
+		err = order.HandedOverOrder(db, orderID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		w.Write([]byte("Order handed over"))
 	}
 }
 
