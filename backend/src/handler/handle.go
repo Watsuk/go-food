@@ -37,6 +37,7 @@ func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
 	})
 
 	handlers.Get("/users", myhttp.GetUsersEndpoint(db))
+	handlers.Get("/users/{userID:[0-9]+}", myhttp.GetUserByIdEndpoint(db))
 	handlers.Post("/register", myhttp.CreateUserEndpoint(db))
 	handlers.Post("/login", myhttp.LoginEndpoint(db))
 	handlers.Delete("/delete-account/{userID:[0-9]+}", myhttp.DeleteAccountEndpoint(db))
