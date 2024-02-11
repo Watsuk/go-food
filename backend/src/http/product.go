@@ -7,14 +7,25 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Watsuk/go-food/src/auth"
+	"github.com/Watsuk/go-food/src/permissions"
 	"github.com/Watsuk/go-food/src/product"
 	"github.com/go-chi/chi"
 )
 
 func CreateProductEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.Restaurateur, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		var newProduct newProduct // On crée une variable de type Product
-		err := json.NewDecoder(r.Body).Decode(&newProduct)
+		err = json.NewDecoder(r.Body).Decode(&newProduct)
 
 		if err != nil {
 			log.Printf("Erreur de décodage JSON : %v", err)
@@ -44,6 +55,15 @@ func CreateProductEndpoint(db *sql.DB) http.HandlerFunc {
 
 func GetProductByIdEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.User, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		productIDString := chi.URLParam(r, "productID")
 
 		productID, err := strconv.Atoi(productIDString)

@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/Watsuk/go-food/src/entity"
+	"github.com/Watsuk/go-food/src/permissions"
+	"github.com/Watsuk/go-food/src/tokens"
 	"github.com/dgrijalva/jwt-go"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
@@ -103,10 +105,10 @@ func CreateUser(db *sql.DB, userName string, password string, email string, role
 		Username: userName,
 		Password: string(hashedPassword),
 		Email:    email,
-		Role:     role,
+		Role:     permissions.Permission(role),
 	}
 
-	_, err = db.Exec("INSERT INTO users (username, pw_hash, email, permissions) VALUES (?, ?, ?, ?)", user.Username, user.Password, user.Email, user.Role)
+	_, err = db.Exec("INSERT INTO users (username, pw_hash, email, permissions) VALUES (?, ?, ?, ?)", user.Username, user.Password, user.Email, int(user.Role))
 	if err != nil {
 		log.Printf("Erreur lors de la création de l'utilisateur : %v", err)
 		return entity.User{}, fmt.Errorf("could not create user: %v", err)
@@ -120,31 +122,34 @@ func Login(db *sql.DB, email, password string) (int64, string, error) {
 	err := db.QueryRow("SELECT id, pw_hash FROM users WHERE email = ?", email).Scan(&user.ID, &user.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return 0, "", errors.New("invalid email or password")
+			return 0, "", errors.New("invalid email")
 
 		}
 		return 0, "", err
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return 0, "", err
+	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
+		return 0, "", errors.New("invalid password")
 	}
 
-	if string(hashedPassword) != user.Password {
-		return 0, "", errors.New("invalid email or password")
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userId": user.ID,
+	tk := jwt.NewWithClaims(jwt.SigningMethodHS256, tokens.Claims{
+		UserId: user.ID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+		},
 	})
 
-	tokenString, err := token.SignedString([]byte("SekretKey"))
+	token, err := tk.SignedString([]byte("SecretKey"))
 	if err != nil {
 		return 0, "", err
 	}
 
-	return user.ID, tokenString, nil
+	// tokenString, err := token.SignedString([]byte("SecretKey"))
+	// if err != nil {
+	// 	return 0, "", err
+	// }
+
+	return user.ID, token, nil
 }
 
 func EditUser(db *sql.DB, userID int64, username string, email string, role int) error {
