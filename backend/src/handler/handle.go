@@ -40,7 +40,7 @@ func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
 	handlers.Get("/user/{userID:[0-9]+}", myhttp.GetUserByIdEndpoint(db))
 	handlers.Post("/register", myhttp.CreateUserEndpoint(db))
 	handlers.Post("/login", myhttp.LoginEndpoint(db))
-	handlers.Delete("/delete-account/{userID:[0-9]+}", myhttp.DeleteAccountEndpoint(db))
+	handlers.Patch("/delete-account/{userID:[0-9]+}", myhttp.DeleteAccountEndpoint(db))
 
 	handlers.Post("/create-truck", myhttp.CreateTrucksEndpoint(db))
 	handlers.Delete("/delete-truck/{truckID:[0-9]+}", myhttp.DeleteTruckEndpoint(db))
@@ -57,6 +57,15 @@ func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
 	handlers.Post("/product", myhttp.CreateProductEndpoint(db))
 	handlers.Get("/product/{productID:[0-9]+}", myhttp.GetProductByIdEndpoint(db))
 	handlers.Get("/products/truck/{truckID:[0-9]+}", myhttp.GetProductsByTruckEndpoint(db))
+
+	handlers.Patch("/users/{userID:[0-9]+}", myhttp.AdminEditEndpoint(db))
+	handlers.Delete("/users/{userID:[0-9]+}", myhttp.AdminDeleteEndpoint(db))
+  
+	handlers.Get("/trucks", myhttp.GetTrucksEndpoint(db))
+	handlers.Get("/trucks/{truckID:[0-9]+}", myhttp.GetTruckByIDEndpoint(db))
+	handlers.Get("/trucks/user/{userID:[0-9]+}", myhttp.GetTrucksByUserIDEndpoint(db))
+	handlers.Patch("/trucks/{truckID:[0-9]+}", myhttp.EditTruckEndpoint(db))
+
 	return handlers
 }
 

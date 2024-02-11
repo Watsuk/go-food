@@ -8,12 +8,24 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Watsuk/go-food/src/auth"
+	"github.com/Watsuk/go-food/src/permissions"
+	"github.com/Watsuk/go-food/src/token"
 	"github.com/Watsuk/go-food/src/user"
 	"github.com/go-chi/chi"
 )
 
 func GetUsersEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.Admin, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		// Récupérer l'utilisateur
 		users, err := user.GetUsers(db)
 		if err != nil {
@@ -35,6 +47,15 @@ func GetUsersEndpoint(db *sql.DB) http.HandlerFunc {
 
 func GetUserByIdEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.User, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		// Récupérer l'ID de l'utilisateur
 		userIDString := chi.URLParam(r, "userID")
 
@@ -110,18 +131,25 @@ func LoginEndpoint(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		userID, token, err := user.Login(db, loginData.Email, loginData.Password)
+		userID, tk, err := user.Login(db, loginData.Email, loginData.Password)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
 
 		response := struct {
-			UserID int64  `json:"user_id"`
+			UserID int64  `json:"userId"`
 			Token  string `json:"token"`
 		}{
 			UserID: userID,
-			Token:  token,
+			Token:  tk,
+		}
+
+		err = token.AddToken(db, tk, userID)
+		if err != nil {
+			fmt.Println(err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -131,6 +159,15 @@ func LoginEndpoint(db *sql.DB) http.HandlerFunc {
 
 func DeleteAccountEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.User, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		userIDToDelete := chi.URLParam(r, "userID")
 
 		if userIDToDelete == "" {
