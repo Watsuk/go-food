@@ -14,3 +14,31 @@ export const deleteAccount = async () => {
   console.log(response.json());
   return response.json();
 };
+
+export const getUsers = async () => {
+  const response = await fetch(`${API_URL}/users`, {
+    method: "GET", 
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch users");
+  }
+  return response.json(); 
+};
+
+export const getUserById = async (userID: number) => {
+  const response = await fetch(`${API_URL}/user/${userID}`, {
+    method: "GET", 
+    headers: {
+      "Accept": "application/json", 
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch user");
+  }
+  return response.json(); 
+};
+
+
