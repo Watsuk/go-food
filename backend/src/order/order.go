@@ -34,6 +34,10 @@ func CreateOrder(db *sql.DB, userID int, truckID int, products []int, quantity [
 		if err != nil {
 			return entity.Order{}, err
 		}
+		if productDetail.TruckID != int64(truckID) {
+			return entity.Order{}, fmt.Errorf("Product %d does not belong to truck %d", prod, truckID)
+		}
+
 		price += int(productDetail.Price) * quantity[i]
 		productsDetails = append(productsDetails, productDetail)
 	}
