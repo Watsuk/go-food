@@ -10,7 +10,7 @@ import (
 
 func GetProduct(db *sql.DB, productID int64) (entity.Product, error) {
 	var product entity.Product
-	rows, err := db.Query("SELECT id, truck_id, naùe, label, description, price, created_at, updated_at FROM product WHERE id = ?", productID)
+	rows, err := db.Query("SELECT id, truck_id, name, label, description, price, created_at, updated_at FROM product WHERE id = ?", productID)
 	if err != nil {
 		return entity.Product{}, err
 	}
