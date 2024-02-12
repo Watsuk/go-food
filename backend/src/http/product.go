@@ -112,6 +112,32 @@ func GetProductsByTruckEndpoint(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+func DeleteProductEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.Restaurateur, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		productIDString := chi.URLParam(r, "productID")
+
+		productID, err := strconv.Atoi(productIDString)
+
+		err = product.DeleteProduct(db, int64(productID))
+
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		w.Write([]byte("Product deleted"))
+	}
+}
+
 type newProduct struct {
 	TruckID     int    `json:"truckID"`
 	Name        string `json:"name"`
