@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
+func NewHandler(db *sql.DB, ref entity.Reference) *HandlerReference {
 
 	handlers := &HandlerReference{
 		chi.NewRouter(),
@@ -40,10 +40,16 @@ func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
 	handlers.Get("/user/{userID:[0-9]+}", myhttp.GetUserByIdEndpoint(db))
 	handlers.Post("/register", myhttp.CreateUserEndpoint(db))
 	handlers.Post("/login", myhttp.LoginEndpoint(db))
-	handlers.Patch("/delete-account/{userID:[0-9]+}", myhttp.DeleteAccountEndpoint(db))
+	handlers.Delete("/delete-account/{userID:[0-9]+}", myhttp.DeleteAccountEndpoint(db))
+	handlers.Patch("/users/{userID:[0-9]+}", myhttp.AdminEditEndpoint(db))
+	handlers.Delete("/users/{userID:[0-9]+}", myhttp.AdminDeleteEndpoint(db))
 
 	handlers.Post("/create-truck", myhttp.CreateTrucksEndpoint(db))
 	handlers.Delete("/delete-truck/{truckID:[0-9]+}", myhttp.DeleteTruckEndpoint(db))
+	handlers.Get("/trucks", myhttp.GetTrucksEndpoint(db))
+	handlers.Get("/trucks/{truckID:[0-9]+}", myhttp.GetTruckByIDEndpoint(db))
+	handlers.Get("/trucks/user/{userID:[0-9]+}", myhttp.GetTrucksByUserIDEndpoint(db))
+	handlers.Patch("/trucks/{truckID:[0-9]+}", myhttp.EditTruckEndpoint(db))
 
 	handlers.Patch("/order/accept/{orderID:[0-9]+}/{accept:[0-1]}", myhttp.AcceptOrderEndpoint(db))
 	handlers.Get("/order/{orderID:[0-9]+}", myhttp.GetOrdersByIdEndpoint(db))
@@ -53,26 +59,20 @@ func NewHandlerUser(db *sql.DB, ref entity.Reference) *HandlerReference {
 	handlers.Get("/orders", myhttp.GetOrdersEndpoint(db))
 	handlers.Patch("/order/{orderID:[0-9]+}/completed", myhttp.CompletedOrderEndpoint(db))
 	handlers.Patch("/order/{orderID:[0-9]+}/handedover", myhttp.HandedOverOrderEndpoint(db))
+	handlers.Delete("/order/{orderID:[0-9]+}", myhttp.DeleteOrderEndpoint(db))
 
 	handlers.Post("/product", myhttp.CreateProductEndpoint(db))
 	handlers.Get("/product/{productID:[0-9]+}", myhttp.GetProductByIdEndpoint(db))
 	handlers.Get("/products/truck/{truckID:[0-9]+}", myhttp.GetProductsByTruckEndpoint(db))
-
-	handlers.Patch("/users/{userID:[0-9]+}", myhttp.AdminEditEndpoint(db))
-	handlers.Delete("/users/{userID:[0-9]+}", myhttp.AdminDeleteEndpoint(db))
-  
-	handlers.Get("/trucks", myhttp.GetTrucksEndpoint(db))
-	handlers.Get("/trucks/{truckID:[0-9]+}", myhttp.GetTruckByIDEndpoint(db))
-	handlers.Get("/trucks/user/{userID:[0-9]+}", myhttp.GetTrucksByUserIDEndpoint(db))
-	handlers.Patch("/trucks/{truckID:[0-9]+}", myhttp.EditTruckEndpoint(db))
+	handlers.Delete("/product/{productID:[0-9]+}", myhttp.DeleteProductEndpoint(db))
 
 	return handlers
 }
 
 type HandlerReference struct {
 	*chi.Mux
-	user  *entity.User
-	truck *entity.Truck
-	chart *entity.Product
-	order *entity.Order
+	user    *entity.User
+	truck   *entity.Truck
+	product *entity.Product
+	order   *entity.Order
 }
