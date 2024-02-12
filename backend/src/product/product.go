@@ -85,3 +85,11 @@ func GetProductsByTruckID(db *sql.DB, truckID int64) ([]entity.Product, error) {
 
 	return products, nil
 }
+
+func DeleteProduct(db *sql.DB, productID int64) error {
+	_, err := db.Exec("DELETE FROM product WHERE id = ?", productID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

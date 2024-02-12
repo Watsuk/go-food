@@ -81,8 +81,7 @@ func GetOrderById(db *sql.DB, orderID int) (entity.Order, error) {
 	var orderData []uint8
 	var createdAt []uint8
 	var updatedAt []uint8
-	var deletedAt []uint8
-	err := db.QueryRow("SELECT * FROM orders WHERE order_id = ?", orderID).Scan(&order.ID, &order.UserID, &order.TruckID, &order.Price, &hours, &order.Status, &orderData, &createdAt, &updatedAt, &deletedAt)
+	err := db.QueryRow("SELECT * FROM orders WHERE order_id = ?", orderID).Scan(&order.ID, &order.UserID, &order.TruckID, &order.Price, &hours, &order.Status, &orderData, &createdAt, &updatedAt)
 	if err != nil {
 		fmt.Println(err)
 		return entity.Order{}, err
@@ -126,8 +125,7 @@ func GetOrdersByTruck(db *sql.DB, truckID int) ([]entity.Order, error) {
 		var orderData []uint8
 		var createdAt []uint8
 		var updatedAt []uint8
-		var deletedAt []uint8
-		err := rows.Scan(&order.ID, &order.UserID, &order.TruckID, &order.Price, &hours, &order.Status, &orderData, &createdAt, &updatedAt, &deletedAt)
+		err := rows.Scan(&order.ID, &order.UserID, &order.TruckID, &order.Price, &hours, &order.Status, &orderData, &createdAt, &updatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -168,8 +166,7 @@ func GetOrdersByUser(db *sql.DB, userID int) ([]entity.Order, error) {
 		var orderData []uint8
 		var createdAt []uint8
 		var updatedAt []uint8
-		var deletedAt []uint8
-		err := rows.Scan(&order.ID, &order.UserID, &order.TruckID, &order.Price, &hours, &order.Status, &orderData, &createdAt, &updatedAt, &deletedAt)
+		err := rows.Scan(&order.ID, &order.UserID, &order.TruckID, &order.Price, &hours, &order.Status, &orderData, &createdAt, &updatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -210,8 +207,7 @@ func GetOrders(db *sql.DB) ([]entity.Order, error) {
 		var orderData []uint8
 		var createdAt []uint8
 		var updatedAt []uint8
-		var deletedAt []uint8
-		err := rows.Scan(&order.ID, &order.UserID, &order.TruckID, &order.Price, &hours, &order.Status, &orderData, &createdAt, &updatedAt, &deletedAt)
+		err := rows.Scan(&order.ID, &order.UserID, &order.TruckID, &order.Price, &hours, &order.Status, &orderData, &createdAt, &updatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -257,6 +253,14 @@ func HandedOverOrder(db *sql.DB, orderID int) error {
 		return fmt.Errorf("Order not completed")
 	}
 	_, err = db.Exec("UPDATE orders SET status = ?, updated_at = ? WHERE order_id = ?", "handedover", time.Now(), orderID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func DeleteOrder(db *sql.DB, orderID int) error {
+	_, err := db.Exec("DELETE FROM orders WHERE order_id = ?", orderID)
 	if err != nil {
 		return err
 	}

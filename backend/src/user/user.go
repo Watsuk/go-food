@@ -16,22 +16,19 @@ import (
 )
 
 func GetUsers(db *sql.DB) ([]entity.User, error) {
-	rows, err := db.Query("SELECT id, username, email, permissions, created_at, updated_at, deleted_at FROM users")
+	rows, err := db.Query("SELECT id, username, email, permissions, created_at, updated_at FROM users")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
 
 	var users []entity.User
-	var createdAt, updatedAt, deleted_at []uint8
+	var createdAt, updatedAt []uint8
 	for rows.Next() {
 		var user entity.User
-		err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Role, &createdAt, &updatedAt, &deleted_at)
+		err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Role, &createdAt, &updatedAt)
 		if err != nil {
 			log.Fatal(err)
-		}
-		if deleted_at != nil {
-			continue
 		}
 
 		createdAtString := string(createdAt)
@@ -54,20 +51,17 @@ func GetUsers(db *sql.DB) ([]entity.User, error) {
 }
 
 func GetUserByID(db *sql.DB, userID int) (*entity.User, error) {
-	row := db.QueryRow("SELECT id, username, email, permissions, created_at, updated_at, deleted_at FROM users WHERE id = ?", userID)
+	row := db.QueryRow("SELECT id, username, email, permissions, created_at, updated_at,  FROM users WHERE id = ?", userID)
 
 	var user entity.User
-	var createdAt, updatedAt, deletedAt []uint8
+	var createdAt, updatedAt []uint8
 
-	err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Role, &createdAt, &updatedAt, &deletedAt)
+	err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Role, &createdAt, &updatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		log.Fatal(err)
-	}
-	if deletedAt != nil {
-		return nil, nil
 	}
 
 	createdAtString := string(createdAt)
@@ -80,14 +74,6 @@ func GetUserByID(db *sql.DB, userID int) (*entity.User, error) {
 	user.UpdatedAt, err = time.Parse("2006-01-02 15:04:05", updatedAtString)
 	if err != nil {
 		log.Fatal(err)
-	}
-
-	if deletedAt != nil {
-		deletedAtString := string(deletedAt)
-		user.DeletedAt, err = time.Parse("2006-01-02 15:04:05", deletedAtString)
-		if err != nil {
-			log.Fatal(err)
-		}
 	}
 
 	return &user, nil
@@ -153,7 +139,7 @@ func EditUser(db *sql.DB, userID int64, username string, email string, role int)
 }
 
 func DeleteUser(db *sql.DB, userID int64) error {
-	_, err := db.Exec("UPDATE users SET deleted_at = ? WHERE id = ?", time.Now(), userID)
+	_, err := db.Exec("DELETE users WHERE id = ?", userID)
 	fmt.Println(err)
 	return err
 }
