@@ -32,3 +32,9 @@ export interface Product {
     updatedAt: string;
     deletedAt: string;
 }
+
+export const ROLE_MAP: { [key: number]: string } = {
+    1: "Client",
+    3: "Restaurateur",
+    5: "Admin",
+};

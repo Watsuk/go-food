@@ -1,8 +1,8 @@
-import { User } from "@/types/type";
+import { ROLE_MAP, User } from "@/types/type";
 import React, { useEffect, useState } from "react";
 
 interface HeaderPanelProps {
-  userData: User | null;
+  userData: User;
 }
 
 const HeaderPanel: React.FC<HeaderPanelProps> = ({ userData }) => {
@@ -46,26 +46,25 @@ const HeaderPanel: React.FC<HeaderPanelProps> = ({ userData }) => {
           <input
             type="text"
             name="name"
-            value={user?.username}
+            value={user.username}
             onChange={handleChange}
             className="border border-gray-400 p-2 rounded"
           />
         ) : (
-          <p>{user?.username}</p>
+          <p>{user.username}</p>
         )}
       </div>
       <div className="mt-4">
-        <label className="block mb-2 font-bold">Role:</label>
+        <label>Role:</label>
         {editing ? (
           <input
             type="text"
             name="role"
-            value={user?.role}
+            value={user.role}
             onChange={handleChange}
-            className="border border-gray-400 p-2 rounded"
           />
         ) : (
-          <p>{user?.role}</p>
+          <p>{ROLE_MAP[user.role]}</p> // Utilise ROLE_MAP pour obtenir la description du rôle
         )}
       </div>
       <div className="mt-4">
@@ -74,12 +73,12 @@ const HeaderPanel: React.FC<HeaderPanelProps> = ({ userData }) => {
           <input
             type="email"
             name="email"
-            value={user?.email}
+            value={user.email}
             onChange={handleChange}
             className="border border-gray-400 p-2 rounded"
           />
         ) : (
-          <p>{user?.email}</p>
+          <p>{user.email}</p>
         )}
       </div>
       <div className="mt-4">
@@ -88,12 +87,12 @@ const HeaderPanel: React.FC<HeaderPanelProps> = ({ userData }) => {
           <input
             type="password"
             name="password"
-            value={user?.role}
+            value={user.role}
             onChange={handleChange}
             className="border border-gray-400 p-2 rounded"
           />
         ) : (
-          <p>{user?.role}</p>
+          <p>{user.role}</p>
         )}
       </div>
       {editing && (

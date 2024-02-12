@@ -8,31 +8,49 @@ export default function CreateTruckForm() {
   const [name, setName] = useState("");
   const [openTime, setOpenTime] = useState("");
   const [closeTime, setCloseTime] = useState("");
-  const [slotBuffer, setSlotBuffer] = useState("");
+  const [slotBuffer, setSlotBuffer] = useState(0);
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("user_id");
+    const jwt = localStorage.getItem("token");
+    if (!jwt) {
+      setMessage(
+        "Token d'authentification manquant. Veuillez vous reconnecter."
+      );
+      return;
+    }
+
+    const user_id = Number(localStorage.getItem("user_id"));
+    if (isNaN(user_id)) {
+      setMessage("Erreur d'identification de l'utilisateur.");
+      return;
+    }
 
     try {
-      // Remplace les valeurs par celles appropriées, notamment `userID` si nécessaire
-      // const truck = await createTruck(token!, {
-      //   name: name,
-      //   open_time: openTime,
-      //   close_time: closeTime,
-      //   slot_buffer: parseFloat(slotBuffer, 10),
-      //   user_id: parseFloat(userId),
-      // });
+      await createTruck(jwt, {
+        name,
+        user_id,
+        slot_buffer: Number(slotBuffer),
+        open_time: openTime,
+        close_time: closeTime,
+      });
 
-      setMessage("Truck created successfully");
-      // Réinitialise le formulaire ou navigue vers une autre page si nécessaire
+      setMessage("Truck créé avec succès.");
+      setName("");
+      setOpenTime("");
+      setCloseTime("");
+      setSlotBuffer(0);
     } catch (error) {
-      setMessage(error.message);
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de la création du camion."
+      );
     }
   };
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <Label>Nom du camion</Label>
@@ -58,11 +76,11 @@ export default function CreateTruckForm() {
         type="time"
       />
 
-      <Label>Intervalle de temps entre les slots (en minutes)</Label>
+      <Label> nombre de commande max en simultané</Label>
       <Input
         value={slotBuffer}
-        onChange={(e) => setSlotBuffer(e.target.value)}
-        placeholder="Intervalle"
+        onChange={(e) => setSlotBuffer(parseInt(e.target.value, 10))}
+        placeholder="commande max en simultané"
         type="number"
       />
 

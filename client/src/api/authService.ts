@@ -18,14 +18,15 @@ export const signin = async (email: string, password: string) => {
 export const register = async (
   userName: string,
   email: string,
-  password: string
+  password: string,
+  userRole: number
 ) => {
   const response = await fetch(`${API_URL}/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ username: userName, email, password, role: 1 }),
+    body: JSON.stringify({ username: userName, email, password, role: userRole }),
   });
   if (!response.ok) {
     throw new Error("Registration failed");

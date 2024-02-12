@@ -7,6 +7,7 @@ const Navbar = () => {
         onClick={() => {
           localStorage.removeItem("token");
           localStorage.removeItem("user_id");
+          localStorage.removeItem("user_role");
           window.location.href = "/auth/signin";
         }}
       >

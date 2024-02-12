@@ -39,7 +39,7 @@ func GetTruckByID(db *sql.DB, truckID int64) (entity.Truck, error) {
 }
 
 func GetTrucksByUserID(db *sql.DB, userID int64) ([]entity.Truck, error) {
-	rows, err := db.Query("SELECT * FROM trucks WHERE user_id = ?", userID)
+	rows, err := db.Query("SELECT id, user_id, name, slot_buffer, opening, closing FROM trucks WHERE user_id = ?", userID)
 	if err != nil {
 		log.Printf("Erreur lors de la récupération des camions : %v", err)
 		return nil, err
@@ -49,7 +49,7 @@ func GetTrucksByUserID(db *sql.DB, userID int64) ([]entity.Truck, error) {
 	var trucks []entity.Truck
 	for rows.Next() {
 		var truck entity.Truck
-		err := rows.Scan(&truck.ID, &truck.Name, &truck.UserID, &truck.SlotBuffer, &truck.OpenTime, &truck.CloseTime)
+		err := rows.Scan(&truck.ID, &truck.UserID, &truck.Name, &truck.SlotBuffer, &truck.OpenTime, &truck.CloseTime)
 		if err != nil {
 			log.Printf("Erreur lors de la lecture des camions : %v", err)
 			return nil, err

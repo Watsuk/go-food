@@ -1,11 +1,12 @@
 const API_URL = "http://localhost:3000";
 
-export const deleteAccount = async () => {
+export const deleteAccount = async (jwt: string, userID: number) => {
   //const token = localStorage.getItem("token");
-  const response = await fetch(`${API_URL}/delete-account`, {
+  const response = await fetch(`${API_URL}/delete-account/${userID}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": jwt,
     },
   });
   if (!response.ok) {
@@ -15,11 +16,12 @@ export const deleteAccount = async () => {
   return response.json();
 };
 
-export const getUsers = async () => {
+export const getUsers = async (jwt: string) => {
   const response = await fetch(`${API_URL}/users`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": jwt,
     },
   });
   if (!response.ok) {
@@ -43,4 +45,34 @@ export const getUserById = async (jwt: string, userID: number) => {
   return response.json();
 };
 
+export const editAccount = async (jwt: string, userID: number) => {
+  //const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/users/${userID}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": jwt,
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Edit account failed");
+  }
+  console.log(response.json());
+  return response.json();
+};
 
+export const adminDelete = async (jwt: string, userID: number) => {
+  //const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/users/${userID}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": jwt,
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Delete account failed");
+  }
+  console.log(response.json());
+  return response.json();
+};

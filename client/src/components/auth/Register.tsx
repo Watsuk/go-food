@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { register } from "@/api/authService";
 
 export default function Register() {
+  const [role, setRole] = useState(0);
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +19,7 @@ export default function Register() {
       return;
     }
     try {
-      const data = await register(userName, email, password);
+      const data = await register(userName, email, password, role);
       if (data) {
         setMessage("Register successful");
         setUserName("");
@@ -60,6 +61,36 @@ export default function Register() {
           type="password"
         />
       </div>
+      <div className="w-full flex flex-row gap-3">
+        <Label>Role</Label>
+        <div>
+          <input
+            type="radio"
+            name="role"
+            value="1"
+            checked={role === 1}
+            onChange={(e) => setRole(parseInt(e.target.value, 10))}
+          />
+          Client
+          <input
+            type="radio"
+            name="role"
+            value="3"
+            checked={role === 3}
+            onChange={(e) => setRole(parseInt(e.target.value, 10))}
+          />
+          Restaurateur
+          <input
+            type="radio"
+            name="role"
+            value="5"
+            checked={role === 5}
+            onChange={(e) => setRole(parseInt(e.target.value, 10))}
+          />
+          Admin
+        </div>
+      </div>
+
       <div>
         <Label>Confirm Password</Label>
         <Input
