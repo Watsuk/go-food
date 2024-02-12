@@ -32,9 +32,11 @@ func CreateOrder(db *sql.DB, userID int, truckID int, products []int, quantity [
 	for i, prod := range products {
 		productDetail, err := product.GetProduct(db, int64(prod))
 		if err != nil {
+			fmt.Println(err)
 			return entity.Order{}, err
 		}
 		if productDetail.TruckID != int64(truckID) {
+			fmt.Println(err)
 			return entity.Order{}, fmt.Errorf("Product %d does not belong to truck %d", prod, truckID)
 		}
 
@@ -49,6 +51,7 @@ func CreateOrder(db *sql.DB, userID int, truckID int, products []int, quantity [
 	}
 	orderDataJSON, err := json.Marshal(orderData)
 	if err != nil {
+		fmt.Println(err)
 		return entity.Order{}, err
 	}
 
@@ -60,6 +63,7 @@ func CreateOrder(db *sql.DB, userID int, truckID int, products []int, quantity [
 
 	orderID, err := res.LastInsertId()
 	if err != nil {
+		fmt.Println(err)
 		return entity.Order{}, err
 	}
 	order := entity.Order{

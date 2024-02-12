@@ -51,7 +51,7 @@ func GetUsers(db *sql.DB) ([]entity.User, error) {
 }
 
 func GetUserByID(db *sql.DB, userID int) (*entity.User, error) {
-	row := db.QueryRow("SELECT id, username, email, permissions, created_at, updated_at,  FROM users WHERE id = ?", userID)
+	row := db.QueryRow("SELECT id, username, email, permissions, created_at, updated_at FROM users WHERE id = ?", userID)
 
 	var user entity.User
 	var createdAt, updatedAt []uint8
