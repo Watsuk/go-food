@@ -52,6 +52,7 @@ func NewHandler(db *sql.DB, ref entity.Reference) *HandlerReference {
 	handlers.Patch("/trucks/{truckID:[0-9]+}", myhttp.EditTruckEndpoint(db))
 	handlers.Get("/truck/{truckID:[0-9]+}/number-current-orders", myhttp.GetNumberCurrentOrdersByTruckIDEndpoint(db))
 
+
 	handlers.Patch("/order/accept/{orderID:[0-9]+}/{accept:[0-1]}", myhttp.AcceptOrderEndpoint(db))
 	handlers.Get("/order/{orderID:[0-9]+}", myhttp.GetOrdersByIdEndpoint(db))
 	handlers.Post("/order", myhttp.CreateOrderEndpoint(db))
