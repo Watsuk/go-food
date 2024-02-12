@@ -3,11 +3,14 @@ import { useState, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signin } from "@/api/authService";
+import { useNavigate } from "react-router-dom";
 
 export default function Sigin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -16,8 +19,9 @@ export default function Sigin() {
       if (data) {
         setMessage("Signin successful");
         localStorage.setItem("token", data.token);
+        localStorage.setItem("user_id", data.userId);
         setTimeout(() => {
-          window.location.href = "/dashboard";
+          navigate("/dashboard");
         }, 2000);
       }
     } catch (error) {

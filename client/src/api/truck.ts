@@ -15,18 +15,19 @@ export const deleteTruck = async (truckID: number): Promise<void> => {
   return;
 };
 
-export const createTruck = async (truckData: Truck): Promise<Truck> => {
+export const createTruck = async (jwt: string, truckData: Truck): Promise<Truck> => {
   const response = await fetch(`${API_URL}/create-truck`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": jwt,
     },
     body: JSON.stringify({
       name: truckData.name,
-      userID: truckData.userID,
-      slotBuffer: truckData.slotBuffer,
-      openTime: truckData.openTime,
-      closeTime: truckData.closeTime,
+      userID: truckData.user_id,
+      slotBuffer: truckData.slot_buffer,
+      openTime: truckData.open_time,
+      closeTime: truckData.close_time,
     }),
   });
 
@@ -37,12 +38,13 @@ export const createTruck = async (truckData: Truck): Promise<Truck> => {
   return response.json();
 };
 
-export const getTrucks = async (): Promise<Truck[]> => {
+// add jwt into header
+export const getTrucks = async (jwt: string): Promise<[]> => {
   const response = await fetch(`${API_URL}/trucks`, {
     method: "GET",
     headers: {
       "Accept": "application/json",
-
+      "Authorization": jwt,
     },
 
   });
@@ -53,12 +55,12 @@ export const getTrucks = async (): Promise<Truck[]> => {
 
   return response.json();
 };
-
-export const getTrucksByTruckId = async (truckId: number): Promise<Truck> => {
+export const getTrucksByTruckId = async (jwt: string, truckId: number): Promise<Truck> => {
   const response = await fetch(`${API_URL}/trucks/${truckId}`, {
     method: "GET",
     headers: {
       "Accept": "application/json",
+      "Authorization": jwt,
     },
   });
 

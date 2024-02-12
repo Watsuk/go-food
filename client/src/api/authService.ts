@@ -25,7 +25,7 @@ export const register = async (
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ username: userName, email, password }),
+    body: JSON.stringify({ username: userName, email, password, role: 1 }),
   });
   if (!response.ok) {
     throw new Error("Registration failed");

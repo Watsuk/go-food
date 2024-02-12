@@ -17,7 +17,7 @@ export const deleteAccount = async () => {
 
 export const getUsers = async () => {
   const response = await fetch(`${API_URL}/users`, {
-    method: "GET", 
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
@@ -25,20 +25,22 @@ export const getUsers = async () => {
   if (!response.ok) {
     throw new Error("Failed to fetch users");
   }
-  return response.json(); 
+  return response.json();
 };
 
-export const getUserById = async (userID: number) => {
+export const getUserById = async (jwt: string, userID: number) => {
   const response = await fetch(`${API_URL}/user/${userID}`, {
-    method: "GET", 
+    method: "GET",
     headers: {
-      "Accept": "application/json", 
+      "Accept": "application/json",
+      "Authorization": jwt,
+
     },
   });
   if (!response.ok) {
     throw new Error("Failed to fetch user");
   }
-  return response.json(); 
+  return response.json();
 };
 
 

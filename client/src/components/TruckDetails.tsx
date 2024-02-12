@@ -30,16 +30,14 @@ const TruckDetails = ({
       <div className="flex flex-row items-center gap-4"></div>
       <h1 className="text-2xl font-bold">{currentTruckData.name}</h1>
       <div className="flex flex-row items-center gap-4">
-        <span>ouvert à : {currentTruckData.openTime}</span>
-        <span>fermé à : {currentTruckData.closeTime}</span>
+        <span>ouvert à : {currentTruckData.open_time}</span>
+        <span>fermé à : {currentTruckData.close_time}</span>
       </div>
       <div className="flex flex-row items-center gap-4">
-        <span>Créer le : {currentTruckData.createdAt}</span>
-        <span>Mis à jour le : {currentTruckData.updatedAt}</span>
-        <span>Supprimé le : {currentTruckData.deletedAt}</span>
+        <span>Créer le : {currentTruckData.created_at}</span>
       </div>
       <ProductDetail product={testProduct} />
-      <span>Slots disponibles : {currentTruckData.slotBuffer}</span>
+      <span>Slots disponibles : {currentTruckData.slot_buffer}</span>
       <Button onClick={() => onEdit(currentTruckData.id)}>Commander</Button>
     </div>
   );

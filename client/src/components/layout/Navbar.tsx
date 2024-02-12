@@ -6,6 +6,7 @@ const Navbar = () => {
         className="text-white"
         onClick={() => {
           localStorage.removeItem("token");
+          localStorage.removeItem("user_id");
           window.location.href = "/auth/signin";
         }}
       >

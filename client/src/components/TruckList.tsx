@@ -36,8 +36,8 @@ function TruckList({
         >
           <h3>{truck.name}</h3>
           <span className="flex gap-4">
-            <span>Open: {truck.openTime}</span>
-            <span>Close: {truck.closeTime}</span>
+            <span>Open: {truck.open_time}</span>
+            <span>Close: {truck.close_time}</span>
           </span>
         </div>
       ))}

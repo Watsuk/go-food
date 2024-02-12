@@ -1,224 +1,71 @@
-import { getTrucks } from "@/api/truck";
+import { getTrucks, getTrucksByTruckId } from "@/api/truck";
+import { getUserById } from "@/api/user";
+import HeaderPanel from "@/components/ShowUserInfo";
 import TruckDetails from "@/components/TruckDetails";
 import TruckList from "@/components/TruckList";
-import { Truck } from "@/types/type";
+import { Truck, User } from "@/types/type"; // Assure-toi que le type User est correctement défini
 import { useEffect, useState } from "react";
-
-const testTruckData: Truck[] = [
-  {
-    id: 1,
-    name: "Truck 1",
-    userId: 1,
-    openTime: "10:00",
-    closeTime: "20:00",
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-    deletedAt: "2022-01-01",
-    slotBuffer: 10,
-  },
-  {
-    id: 2,
-    name: "Truck 2",
-    userId: 1,
-    openTime: "10:00",
-    closeTime: "20:00",
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-    deletedAt: "2022-01-01",
-    slotBuffer: 10,
-  },
-  {
-    id: 3,
-    name: "Truck 3",
-    userId: 1,
-    openTime: "10:00",
-    closeTime: "20:00",
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-    deletedAt: "2022-01-01",
-    slotBuffer: 10,
-  },
-  {
-    id: 4,
-    name: "Truck 4",
-    userId: 1,
-    openTime: "10:00",
-    closeTime: "20:00",
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-    deletedAt: "2022-01-01",
-    slotBuffer: 10,
-  },
-  {
-    id: 5,
-    name: "Truck 5",
-    userId: 1,
-    openTime: "10:00",
-    closeTime: "20:00",
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-    deletedAt: "2022-01-01",
-    slotBuffer: 10,
-  },
-  {
-    id: 6,
-    name: "Truck 6",
-    userId: 1,
-    openTime: "10:00",
-    closeTime: "20:00",
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-    deletedAt: "2022-01-01",
-    slotBuffer: 10,
-  },
-  {
-    id: 7,
-    name: "Truck 7",
-    userId: 1,
-    openTime: "10:00",
-    closeTime: "20:00",
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-    deletedAt: "2022-01-01",
-    slotBuffer: 10,
-  },
-  {
-    id: 8,
-    name: "Truck 8",
-    userId: 1,
-    openTime: "10:00",
-    closeTime: "20:00",
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-    deletedAt: "2022-01-01",
-    slotBuffer: 10,
-  },
-  {
-    id: 9,
-    name: "Truck 9",
-    userId: 1,
-    openTime: "10:00",
-    closeTime: "20:00",
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-    deletedAt: "2022-01-01",
-    slotBuffer: 10,
-  },
-  {
-    id: 10,
-    name: "Truck 10",
-    userId: 1,
-    openTime: "10:00",
-    closeTime: "20:00",
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-    deletedAt: "2022-01-01",
-    slotBuffer: 10,
-  },
-  {
-    id: 11,
-    name: "Truck 11",
-    userId: 1,
-    openTime: "10:00",
-    closeTime: "20:00",
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-    deletedAt: "2022-01-01",
-    slotBuffer: 10,
-  },
-  {
-    id: 12,
-    name: "Truck 12",
-    userId: 1,
-    openTime: "10:00",
-    closeTime: "20:00",
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-    deletedAt: "2022-01-01",
-    slotBuffer: 10,
-  },
-  {
-    id: 13,
-    name: "Truck 13",
-    userId: 1,
-    openTime: "10:00",
-    closeTime: "20:00",
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-    deletedAt: "2022-01-01",
-    slotBuffer: 10,
-  },
-  {
-    id: 14,
-    name: "Truck 14",
-    userId: 1,
-    openTime: "10:00",
-    closeTime: "20:00",
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-    deletedAt: "2022-01-01",
-    slotBuffer: 10,
-  },
-];
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
-  const [message, setMessage] = useState("");
   const [selectedTruck, setSelectedTruck] = useState<Truck | null>(null);
   const [truckData, setTruckData] = useState<Truck[]>([]);
+  const [userData, setUserData] = useState<User | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      setMessage("You are not logged in");
-      setTimeout(() => {
-        window.location.href = "/auth/signin";
-      }, 2000);
+    const userId = localStorage.getItem("user_id"); // Assure-toi que l'ID de l'utilisateur est stocké sous le nom "userId"
+
+    if (!token || !userId) {
+      navigate("/auth/login");
+      return; // Stoppe l'exécution si le token ou l'userId est manquant
     }
+
+    const fetchUserData = async () => {
+      try {
+        const data = await getUserById(token!, parseInt(userId!));
+        setUserData(data);
+        console.error(data);
+      } catch (error) {
+        console.error("Failed to fetch user data", error);
+      }
+    };
 
     const fetchTrucks = async () => {
       try {
-        const trucks = await getTrucks();
+        const trucks = await getTrucks(token!);
         setTruckData(trucks);
       } catch (error) {
         console.error("Failed to fetch trucks", error);
       }
     };
 
+    fetchUserData();
     fetchTrucks();
-    setMessage("");
-  }, []);
+  }, [navigate]);
 
-  const handleTruckSelect = (truckId: number) => {
-    const truck = testTruckData.find((t) => t.id === truckId);
-    setSelectedTruck(truck || null);
+  const handleTruckSelect = async (truckId: number) => {
+    const token = localStorage.getItem("token");
 
-    /*
-    const fetchCurrentTruck = async () => {
-      try {
-        const truck = await getTrucksByTruckId(truckId);
-        setSelectedTruck(truck);
-      } catch (error) {
-        console.error("Failed to fetch truck", error);
-      }
-    };
-
-    fetchCurrentTruck();
-
-    if (!truck) {
-      setMessage("Truck not found");
+    if (truckId === selectedTruck?.id) {
       return;
     }
-    */
+
+    try {
+      const truck = await getTrucksByTruckId(token!, truckId);
+      setSelectedTruck(truck);
+    } catch (error) {
+      console.error("Failed to fetch truck", error);
+    }
   };
 
   return (
-    <div className="w-full h-full flex justify-center items-center gap-4 overflow-hidden">
-      <p className="text-red-500">{message}</p>
+    <div className="w-full h-full flex flex-col justify-center items-center gap-4 overflow-hidden">
+      {userData?.username && <HeaderPanel userData={userData} />}{" "}
       <div className="h-full w-full p-8 flex flex-row items-center justify-between gap-4">
-        <TruckList
-          onTruckSelect={handleTruckSelect}
-          truckData={testTruckData}
-        />
+        <TruckList onTruckSelect={handleTruckSelect} truckData={truckData} />
         <div className="w-3/4 h-full flex flex-col gap-4 border border-gray-300 rounded-lg p-8">
           <TruckDetails
             currentTruckData={selectedTruck}
