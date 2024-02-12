@@ -266,6 +266,38 @@ func HandedOverOrderEndpoint(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+func DeleteOrderEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.Admin, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		orderIDString := chi.URLParam(r, "orderID")
+		if orderIDString == "" {
+			http.Error(w, "Invalid order ID", http.StatusBadRequest)
+			return
+		}
+
+		orderID, err := strconv.Atoi(orderIDString)
+		if err != nil {
+			http.Error(w, "Invalid order ID", http.StatusBadRequest)
+			return
+		}
+
+		err = order.DeleteOrder(db, orderID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		w.Write([]byte("Order deleted"))
+	}
+}
+
 type OrderBody struct {
 	UserID   int       `json:"user_id"`
 	TruckID  int       `json:"truck_id"`

@@ -60,8 +60,8 @@ func GetTrucksByUserID(db *sql.DB, userID int64) ([]entity.Truck, error) {
 }
 
 func EditTruck(db *sql.DB, truckID int64, name string, userID int64, slotBuffer int64, openTime string, closeTime string) error {
-	_, err := db.Exec("UPDATE trucks SET name = ?, user_id = ?, slot_buffer = ?, opening = ?, closing = ? WHERE id = ?", 
-	name, userID, slotBuffer, openTime, closeTime, truckID)
+	_, err := db.Exec("UPDATE trucks SET name = ?, user_id = ?, slot_buffer = ?, opening = ?, closing = ? WHERE id = ?",
+		name, userID, slotBuffer, openTime, closeTime, truckID)
 	return err
 }
 
@@ -87,4 +87,14 @@ func CreateTruck(db *sql.DB, name string, userID int64, slotBuffer int64, openTi
 func DeleteTruck(db *sql.DB, truckID int64) error {
 	_, err := db.Exec("DELETE FROM trucks WHERE id = ?", truckID)
 	return err
+}
+
+func NumberCurrentOrdersByTruckID(db *sql.DB, truckID int64) (int, error) {
+	var response int
+	err := db.QueryRow("SELECT COUNT(*) FROM orders WHERE truck_id = ? AND status IN ('pending', 'accepted', 'completed')", truckID).Scan(&response)
+	if err != nil {
+		log.Printf("Erreur lors de la récupération du camion : %v", err)
+		return response, err
+	}
+	return response, nil
 }

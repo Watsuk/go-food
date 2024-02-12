@@ -233,6 +233,51 @@ func EditTruckEndpoint(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+func GetNumberCurrentOrdersByTruckIDEndpoint(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		perm, err := auth.CheckPerms(permissions.User, w, r, db)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		if !perm {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		truckIDString := chi.URLParam(r, "truckID")
+		if truckIDString == "" {
+			http.Error(w, "Invalid truck ID", http.StatusBadRequest)
+			return
+		}
+
+		truckID, err := strconv.ParseInt(truckIDString, 10, 64)
+		if err != nil {
+			http.Error(w, "Invalid truck ID", http.StatusBadRequest)
+			return
+		}
+
+		nbrCurrentOrder, err := truck.NumberCurrentOrdersByTruckID(db, truckID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		response := struct {
+			Count int `json:"count"`
+		}{
+			Count: nbrCurrentOrder,
+		}
+
+		jsonResponse, err := json.Marshal(response)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonResponse)
+	}
+}
+
 type newTruck struct {
 	Name       string `json:"name"`
 	UserID     int64  `json:"user_id"`
