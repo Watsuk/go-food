@@ -8,7 +8,7 @@ import (
 )
 
 func GetTrucks(db *sql.DB) ([]entity.Truck, error) {
-	rows, err := db.Query("SELECT * FROM trucks")
+	rows, err := db.Query("SELECT id, name, user_id, slot_buffer, opening, closing FROM trucks")
 	if err != nil {
 		log.Printf("Erreur lors de la récupération des camions : %v", err)
 		return nil, err
