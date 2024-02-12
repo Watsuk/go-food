@@ -61,7 +61,7 @@ func HasPerms(perms permissions.Permission, r *http.Request, db *sql.DB) (bool, 
 		return false, err
 	}
 
-	if user.Role != perms {
+	if user.Role & perms != perms {
 		return false, nil
 	}
 

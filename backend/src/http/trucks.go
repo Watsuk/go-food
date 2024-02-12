@@ -159,7 +159,7 @@ func GetTruckByIDEndpoint(db *sql.DB) http.HandlerFunc {
 
 func GetTrucksByUserIDEndpoint(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		perm, err := auth.CheckPerms(permissions.Admin, w, r, db)
+		perm, err := auth.CheckPerms(permissions.Restaurateur, w, r, db)
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return

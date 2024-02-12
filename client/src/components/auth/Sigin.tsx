@@ -3,11 +3,14 @@ import { useState, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signin } from "@/api/authService";
+import { useNavigate } from "react-router-dom";
 
 export default function Sigin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -15,7 +18,11 @@ export default function Sigin() {
       const data = await signin(email, password);
       if (data) {
         setMessage("Signin successful");
-        // localStorage.setItem("JWT_TOKEN", data.token);
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user_id", data.userId);
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 2000);
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unknown error");
